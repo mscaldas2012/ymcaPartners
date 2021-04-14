@@ -10,7 +10,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.FlowableEmitter
 import org.reactivestreams.Publisher
-import java.lang.Boolean
+
 import java.time.Instant
 import java.util.*
 import javax.inject.Singleton
@@ -20,9 +20,9 @@ class CustomRefreshTokenPersistence     // <2>
     (private val refreshTokenRepository: RefreshTokenRepository) : RefreshTokenPersistence {
     @EventListener // <3>
     override fun persistToken(event: RefreshTokenGeneratedEvent) {
-        if (event?.refreshToken != null && event.userDetails != null && event.userDetails.username != null) {
+        if (event.refreshToken != null && event.userDetails != null && event.userDetails.username != null) {
             val payload = event.refreshToken
-            refreshTokenRepository.save(UUID.randomUUID(), event.userDetails.username, payload, Boolean.FALSE, Instant.now()) // <4>
+            refreshTokenRepository.save(UUID.randomUUID(), event.userDetails.username, payload, false, Instant.now()) // <4>
         }
     }
 

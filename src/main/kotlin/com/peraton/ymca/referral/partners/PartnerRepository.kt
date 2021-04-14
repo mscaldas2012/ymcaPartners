@@ -1,4 +1,4 @@
-package com.peraton.ymca.referral
+package com.peraton.ymca.referral.partners
 
 import io.micronaut.context.annotation.Executable
 import io.micronaut.data.annotation.Repository

@@ -1,4 +1,4 @@
-package com.peraton.ymca.referral
+package com.peraton.ymca.referral.partners
 
 import org.mindrot.jbcrypt.BCrypt
 import java.security.InvalidParameterException
@@ -14,7 +14,7 @@ class PartnerService(val repo: PartnerRepository) {
         val clientId = List(12) { alphabet.random() }.joinToString("")
         val newsecret = List(64) { alphabet.random() }.joinToString("")
         //Encrypt secretKey value...
-        val pp = Partner(UUID.randomUUID(), partner.officialName, partner.code, partner.status, partner.associatedY, partner.feedbackURL,
+        val pp = Partner(partner.officialName, partner.code, partner.status, partner.associatedY, partner.feedbackURL,
                 clientId, BCrypt.hashpw(newsecret, BCrypt.gensalt()), partner.contact, partner.role )
         val savedPartner = repo.save(pp)
         //This One Time, the secret is returned (without hashing)

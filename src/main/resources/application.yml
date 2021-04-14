@@ -51,3 +51,5 @@ micronaut:
     endpoints:
       logout:
         enabled: true
+
+phase: "DEV"

@@ -1,5 +1,6 @@
-package com.peraton.ymca.referral
+package com.peraton.ymca.referral.partners
 
+import com.peraton.ymca.referral.Credentials
 import io.micronaut.http.annotation.*
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule

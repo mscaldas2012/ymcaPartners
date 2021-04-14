@@ -1,6 +1,6 @@
 package com.peraton.ymca.referral.security
 
-import com.peraton.ymca.referral.PartnerRepository
+import com.peraton.ymca.referral.partners.PartnerRepository
 import io.micronaut.http.HttpRequest
 import io.micronaut.security.authentication.*
 import io.reactivex.BackpressureStrategy
@@ -26,7 +26,12 @@ class AuthenticationProviderUserPassword : AuthenticationProvider {
             logger.info("checking secret... " + authenticationRequest.secret)
             val partner = partnerRepository.retrieveByClientId(authenticationRequest.identity.toString())
             if (partner != null && BCrypt.checkpw(authenticationRequest.secret.toString(), partner.secretKey)) {
-                emitter.onNext(UserDetails(partner.code, listOf(partner.role)))
+                val user = PartnerUserDetails(partner.code, listOf(partner.role),
+//                    partner.associatedY?.map{ it.dagName }?.toList()
+                    partner.associatedY
+                )
+                //user.
+                emitter.onNext(user)
                 emitter.onComplete()
                 logger.info("Request Successfully authenticated.")
 //            }

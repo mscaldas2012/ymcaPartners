@@ -18,12 +18,12 @@ internal class PartnerServiceTest {
 
     @Test
     fun create() {
-        ymcaSrv.save(Ymca( "Unit Test-1",  "CHI_Y"))
-        ymcaSrv.save(Ymca( "Unit Test-2",  "MI_Y"))
+        ymcaSrv.create(Ymca( "Unit Test-1",  "CHI_Y"))
+        ymcaSrv.create(Ymca( "Unit Test-2",  "MI_Y"))
 
         val ymcas = ymcaSrv.findAll()
 
-        val partner = NewPartner("Unit-Test-1", "PART-1", "Active", ymcas, "N/A", "N/A", "PARTNER")
+        val partner = PartnerVM("Unit-Test-1", "PART-1", "Active", ymcas, "N/A", "N/A", "PARTNER")
         partnerSrv.create(partner)
         val saved = partnerSrv.findByCode("PART-1")
         println("Saved: $saved")

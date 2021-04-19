@@ -1,6 +1,9 @@
 package com.peraton.ymca.referral.partners
 
 import com.peraton.ymca.referral.Credentials
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpResponse.ok
+import io.micronaut.http.MutableHttpResponse
 import io.micronaut.http.annotation.*
 import io.micronaut.security.annotation.Secured
 import io.micronaut.security.rules.SecurityRule
@@ -11,12 +14,10 @@ import javax.inject.Inject
 
 @Controller("/partners")
 @Secured(SecurityRule.IS_AUTHENTICATED)
-class PartnerController {
+class PartnerController(val partnerService: PartnerService) {
     companion object {
         val logger = LoggerFactory.getLogger("PartnerController")
     }
-    @Inject
-    lateinit var partnerService: PartnerService
 
     @Get("/")
     @Secured("ADMIN")
@@ -33,12 +34,19 @@ class PartnerController {
     }
 
     @Post("/")
-//    @Secured("ADMIN")
-    @Secured(SecurityRule.IS_ANONYMOUS)
-    fun createNewPartner(@Body partner: NewPartner): Credentials {
+    @Secured("ADMIN")
+//    @Secured(SecurityRule.IS_ANONYMOUS)
+    fun createNewPartner(@Body partnerVM: PartnerVM): MutableHttpResponse<Any>? {
         logger.info("AUDIT::Creating new partner")
-        val newPartner =  partnerService.create(partner)
-        return Credentials(newPartner.clientId, newPartner.secretKey)
+        runCatching {
+            val newPartner = partnerService.create(partnerVM)
+            logger.info("Partner ${newPartner.partnerId} created successfully!")
+            return ok(Credentials(newPartner.clientId, newPartner.secretKey, newPartner.partnerId))
+        }.onFailure {
+            logger.error(it.message)
+            return HttpResponse.badRequest("Invalid data passed to create Partner with error: ${it.message}")
+        }
+        return null
     }
 
     @Get("/{partner_id}")
@@ -57,7 +65,30 @@ class PartnerController {
         val newKey =  partnerService.resetSecretKey(partnerId)
 
         val partner = partnerService.get(partnerId)
-        return Credentials(partner!!.clientId, newKey)
+        return Credentials(partner!!.clientId, newKey, partner.partnerId)
+    }
+
+
+    @Put("/{partner_id}")
+    @Secured("ADMIN")
+    fun updatePartner(@PathVariable(name = "partner_id") partnerId: UUID, principal: Principal, @Body partner: PartnerVM): MutableHttpResponse<Any>? {
+        logger.info("AUDIT::Updating Partner $partnerId")
+//        if (partnerId != partner.partnerId) {
+//            return HttpResponse.badRequest("Invalid request Path parameter ID and body does not match.")
+//        }
+        runCatching {
+            return HttpResponse.ok(partnerService.update(partnerId, partner))
+        }.onFailure {
+            return HttpResponse.badRequest("Invalid partner data passed with error: ${it.message}")
+        }
+        return null
+    }
+
+    @Delete("/{partner_id}")
+    @Secured("ADMIN")
+    fun delete(@PathVariable(name = "partner_id") partnerId: UUID) {
+        logger.info("AUDIT::Deleting partner $partnerId")
+        partnerService.delete(partnerId)
     }
 
 }

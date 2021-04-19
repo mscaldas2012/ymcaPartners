@@ -22,9 +22,10 @@ class DataLoaderForDev(val repo: PartnerRepository) {
         logger.info("Loading data at startup")
         val clientId = "unittest"
         val secret = BCrypt.hashpw("unittest-unittest-unittest-unittest", BCrypt.gensalt())
-//        val contact = Contact("Marcelo Caldas", "mcq1@cdc.gov", "6785551234")
-        val superAdmin = Partner("Super Admin", "SUPER_ADMIN", "active", null,  "N/A", clientId, secret, "marcelo", "ADMIN", )
-//        contact.partner = superAdmin
+        val marcelo = Contact("Marcelo Caldas", "mcq1@cdc.gov", "6785551234", null)
+        val superAdmin = Partner("Super Admin", "SUPER_ADMIN", "active", null,  "N/A", clientId, secret, listOf(marcelo),  "ADMIN", )
+        marcelo.partner = superAdmin
+
         repo.save(superAdmin)
         logger.info("Super Admin created for Unit TEST")
     }

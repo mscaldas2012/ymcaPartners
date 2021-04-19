@@ -1,3 +1,5 @@
 package com.peraton.ymca.referral
 
-data class Credentials(val clientId: String, val secretKey: String)
+import java.util.*
+
+data class Credentials(val clientId: String, val secretKey: String, val partnerId: UUID)

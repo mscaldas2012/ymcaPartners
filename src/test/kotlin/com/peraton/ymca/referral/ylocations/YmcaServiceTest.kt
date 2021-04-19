@@ -3,9 +3,7 @@ package com.peraton.ymca.referral.ylocations
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
 import javax.inject.Inject
-import javax.persistence.PersistenceException
 import javax.validation.ConstraintViolationException
 
 @MicronautTest
@@ -16,13 +14,13 @@ internal class YmcaServiceTest {
     @Test
     fun save() {
         val ymca = Ymca( "Unit Test1",  "CHI_Y")
-        val saved = service.save(ymca)
+        val saved = service.create(ymca)
         val read =  service.getOne(saved.id)
         println("read: $read")
 
         val emptyY = Ymca() // SHOULD FAIL...
         try {
-            service.save(emptyY)
+            service.create(emptyY)
             assert(false)
         } catch (e: ConstraintViolationException) {
             println("Empty Values Exception appropriately thrown...")
@@ -30,7 +28,7 @@ internal class YmcaServiceTest {
         //Duplicate
         val ymcaDupe = Ymca( "Unit Test1", "CHI_X")
         try {
-            service.save(ymcaDupe)
+            service.create(ymcaDupe)
             assert(false)
         } catch (e: Exception) {
             println("Duplicate Exception properly thrown.")

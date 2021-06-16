@@ -27,6 +27,18 @@ components:
         contact_type:
           type: string
 
+    ymca:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        dag_name:
+          type: string
+          description: the name of the REDCap Data Access Group associated with this Y.
+
     partner:
       type: object
       properties:
@@ -73,9 +85,72 @@ components:
       schema:
         type: string
       required: true
-
-
+    ymca_id:
+      in: path
+      name: ymca_id
+      schema:
+        type: string
+      required: true
 paths:
+  /ymca:
+    get:
+      tags:
+        - YMCA Location Management
+      description: Returns all YMCA Locations from the system that the user has access to
+      responses:
+        '200':
+          description: A list of all YMCA Locations.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ymca'
+    post:
+      tags:
+        - YMCA Location Management
+      description: Creates a new YMCA Location
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ymca'
+      responses:
+        '201':
+          description: YMCA Location was successfully created.
+
+  /ymca/{ymca_id}:
+    parameters:
+      - $ref: '#/components/parameters/ymca_id'
+    get:
+      tags:
+        - YMCA Location Management
+      description: Returns a single YMCA Location identified by ymca_id path parameter
+      responses:
+        '200':
+          description: YMCA location retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ymca'
+    put:
+      tags:
+        - YMCA Location Management
+      description: Updates a single YMCA Location identified by ymca_id path parameter.
+      responses:
+        '200':
+          description: YMCA Location updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ymca'
+    delete:
+      tags:
+        - YMCA Location Management
+      description: deletes a single YMCA Location identified by ymca_id path parameter.
+      responses:
+        '204':
+          description: YMCA Location deleted.
   /partners:
     get:
       tags:
@@ -94,6 +169,11 @@ paths:
       tags:
         - Partner Management
       description: Creates a new Partner
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/partner'
       responses:
         '201':
           description: Partner was successfully created.

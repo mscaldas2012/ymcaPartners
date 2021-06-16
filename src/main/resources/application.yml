@@ -5,7 +5,6 @@ micronaut:
     cors:
       enabled: true
 
-
 #tag::datasources[]
 ---
 datasources:
@@ -17,4 +16,40 @@ datasources:
     schema-generate: CREATE_DROP
     dialect: H2
 #end::datasources[]
+jpa:
+  default:
+    entity-scan:
+      packages: 'com.peraton.ymca.referral'
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: create-drop
+        show_sql: false
 
+#tag::security[]
+micronaut:
+  security:
+    authentication: bearer
+    token:
+      jwt:
+        enabled: true
+        signatures:
+          secret:
+            generator:
+              secret: testChangeMeForAMuchSaferPasswordOtherwiseItseasilyhackable
+#end::security[]
+#tag::refresh[]
+---
+micronaut:
+  security:
+    token:
+      jwt:
+        generator:
+          refresh-token:
+            secret: testChangeMeForAMuchSaferPasswordOtherwiseItseasilyhackable
+#end::refresh[]
+    endpoints:
+      logout:
+        enabled: true
+
+phase: "DEV"

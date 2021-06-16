@@ -1,1 +1,1 @@
-rootProject.name="partners-services"
+rootProject.name="partners"

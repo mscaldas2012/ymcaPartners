@@ -1,21 +1,48 @@
 package com.peraton.ymca.referral.partners
 
-import io.micronaut.data.annotation.Id
-import io.micronaut.data.annotation.MappedEntity
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.peraton.ymca.referral.ylocations.Ymca
+import com.peraton.ymca.referral.ylocations.YmcaVM
+import com.peraton.ymca.referral.ylocations.swapMVVM
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
+import java.util.*
+import javax.persistence.*
 
-@MappedEntity
-data class Partner(@Id val id: String,
-                   var officialName: String,
-                   var status: String,
-                   var associatedY: String,
-                   var feedbackURL: String,
-                   var clientId: String,
-                   var secretKey: String,
-                   var contact: String,
-                   var role: String)
+@Entity
+@Table(name = "partners")
+class Partner(var officialName: String,
+           var code: String,
+           var status: String = "Requested",
+           @ManyToMany(fetch = FetchType.EAGER)
+           var associatedY: List<Ymca>?,
+           var feedbackUrl: String,
+           var clientId: String,
+           @JsonIgnore
+           var secretKey: String,
+           @OneToMany( cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+           @Fetch(value = FetchMode.SUBSELECT)
+           var contacts: List<Contact>?,
+           var role: String,
+           @Id var partnerId: UUID = UUID.randomUUID(), ) {
+    constructor() : this("", "", "Requested", null, "N/A", "N/A", "N/A", null,  "USER")
+}
 
-data class Contact(@Id val id: String,
-                    var name: String,
-                    var email: String,
-                    var phone: String,
-                    var contactType: String)
+data class PartnerVM(val officialName: String,
+                     val code: String,
+                     val status: String?,
+                     val associatedY: List<YmcaVM>?,
+                     val feedbackUrl: String,
+                     val contacts: List<Contact>?,
+                     val role: String?)
+
+fun PartnerVM.swapMVVM(partner: Partner): Partner {
+    partner.officialName = this.officialName
+    partner.code = this.code
+    partner.status = this.status ?: partner.status
+    partner.associatedY = this.associatedY?.swapMVVM()
+    partner.feedbackUrl = this.feedbackUrl
+    partner.contacts = this.contacts
+    partner.role = this.role?: partner.role
+    return partner
+}

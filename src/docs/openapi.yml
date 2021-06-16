@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Partner services
+  description: Service to manage Y's partners sending BSeR Referrals Reqeusts.
+  contact:
+    name: API Support
+    url: http://www.example.com/support
+    email: support@example.com
+  version: 1.0.0-SNAPSHOT
+
+servers:
+  - url: http://localhost:8080
+    description: Local development
+components:
+  schemas:
+    contact:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+          format: phone
+        contact_type:
+          type: string
+
+    partner:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        official_name:
+          type: string
+        status:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: ["requested", "evaluating", "testing", "onboarded", "active", "suspended"]
+              date:
+                type: string
+                format: date
+                description: the most recent date identifies the current status of a given partner.
+            description: a status could be used to identify if the partner is active and ready to send referral requests. A "testing" phase could be used to make sure all credentials are working properly and connectivity has been sorted out.
+        associated_y:
+          type: string
+          description: A Partner can have a specific Y that should receive their referals. (Used for autodag)
+        feedback_url:
+          type: string
+          format: url
+          description: The URL where feedback info should be sent to.
+        feedback_url_credentials:
+          type: object
+          description: the crendentials to authenticate the call to send feedback info.
+        client_id:
+          type: string
+        secret_key:
+          type: string
+
+        contact:
+          $ref: '#/components/schemas/contact'
+
+  parameters:
+    partner_id:
+      in: path
+      name: partner_id
+      schema:
+        type: string
+      required: true
+
+
+paths:
+  /partners:
+    get:
+      tags:
+      - Partner Management
+      description: Returns all pets from the system that the user has access to
+      responses:
+        '200':
+          description: A list of all partners.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/partner'
+    post:
+      tags:
+        - Partner Management
+      description: Creates a new Partner
+      responses:
+        '201':
+          description: Partner was successfully created.
+
+  /partners/{partner_id}:
+    parameters:
+      - $ref: '#/components/parameters/partner_id'
+    get:
+      tags:
+        - Partner Management
+      description: Returns a single Partner identified by partner_id path parameter
+      responses:
+        '200':
+          description: partner retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/partner'
+    put:
+      tags:
+        - Partner Management
+      description: Updates a single partner identified by partner_id path parameter.
+      responses:
+        '200':
+          description: partner updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/partner'
+    delete:
+      tags:
+        - Partner Management
+      description: deletes a single partner identified by partner_id path parameter.
+      responses:
+        '204':
+          description: partner deleted.
+
+  /login:
+    post:
+      tags:
+        - security
+      description: Allows a partner to login with their client_id/Secret_key and generate a new JWT token.
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              properties:
+                client_id:
+                  type: string
+                secret_key:
+                  type: string
+      responses:
+        '200':
+            description: Login successful. JWT Token generated and returned.
